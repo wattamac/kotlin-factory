@@ -1,0 +1,17 @@
+apply plugin: "org.flywaydb.flyway"
+
+[flywayMigrate, flywayClean, flywayBaseline, flywayInfo, flywayRepair, flywayUndo, flywayValidate].each { task ->
+    task.doFirst {
+
+        ext.profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
+
+        def props = new Properties()
+        file("src/main/resources/db/flyway-${profile}.properties").withInputStream {
+            props.load(it)
+        }
+        project.flyway.url = props["flyway.url"]
+        project.flyway.driver = props["flyway.driver"]
+        project.flyway.user = props["flyway.user"]
+        project.flyway.password = props["flyway.password"]
+    }
+}
